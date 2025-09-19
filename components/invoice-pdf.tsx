@@ -72,7 +72,6 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   table: {
-    display: "table",
     width: "100%",
     borderStyle: "solid",
     borderBottomWidth: 1,
@@ -97,17 +96,14 @@ const styles = StyleSheet.create({
   tableCol3: {
     width: "10%",
     padding: 8,
-    textAlign: "center",
   },
   tableCol4: {
     width: "20%",
     padding: 8,
-    textAlign: "right",
   },
   tableCol5: {
     width: "20%",
     padding: 8,
-    textAlign: "right",
   },
   footer: {
     flexDirection: "row",
@@ -119,7 +115,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     width: "30%",
-    textAlign: "center",
   },
   footerLeftBelumLunas: {
     backgroundColor: "#ef4444",
@@ -127,7 +122,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     width: "30%",
-    textAlign: "center",
   },
   footerRight: {
     backgroundColor: "#16a34a",
@@ -135,7 +129,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     width: "30%",
-    textAlign: "center",
   },
   paymentSection: {
     padding: 20,
@@ -177,11 +170,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 })
-
-interface InvoicePDFProps {
-  data: InvoiceData
-  paymentDetail?: PaymentDetail
-}
 
 export function InvoicePDF({ data, paymentDetail }: InvoicePDFProps) {
   const calculateItemTotal = (price: number, quantity: number, discount: number) => {
