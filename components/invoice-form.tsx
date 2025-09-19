@@ -5,10 +5,20 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Card } from "@/components/ui/card"
-import { Trash2, Plus, FileText, Calendar, User, CreditCard, Tag, Percent, CheckCircle2 } from "lucide-react"
+import { Trash2, Plus, FileText, Calendar, User, CreditCard, Tag, Percent, CheckCircle2, Building2 } from "lucide-react"
 import type { InvoiceData } from "@/lib/types"
 import { products } from "@/lib/products"
 import type { UseFormReturn } from "react-hook-form"
+import { useState, useEffect } from "react"
+
+interface PaymentDetail {
+  id: string
+  bank_name: string
+  account_number: string
+  account_name: string
+  is_default: boolean
+  user_id: string
+}
 
 interface InvoiceFormProps {
   form: UseFormReturn<InvoiceData>
@@ -19,6 +29,25 @@ interface InvoiceFormProps {
 export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFormProps) {
   const { control, handleSubmit, watch, setValue } = form
   const items = watch("items")
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([])
+
+  useEffect(() => {
+    // Load payment details from localStorage
+    const savedDetails = localStorage.getItem('paymentDetails')
+    if (savedDetails) {
+      const details = JSON.parse(savedDetails)
+      setPaymentDetails(details)
+      
+      // Set default payment detail if not already set
+      const currentPaymentDetailId = watch("paymentDetailId")
+      if (!currentPaymentDetailId) {
+        const defaultDetail = details.find((d: PaymentDetail) => d.is_default)
+        if (defaultDetail) {
+          setValue("paymentDetailId", defaultDetail.id)
+        }
+      }
+    }
+  }, [watch, setValue])
 
   const addItem = () => {
     if (items.length < 3) {
@@ -268,36 +297,69 @@ export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFor
         </div>
 
         <div className="bg-green-50 p-3 sm:p-4 rounded-lg shadow-inner">
-          <FormField
-            control={control}
-            name="paymentStatus"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>
-                  <span className="flex items-center text-xs sm:text-sm font-medium text-gray-700">
-                    <CreditCard className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
-                    Status Pembayaran
-                  </span>
-                </FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger className="text-xs h-8 sm:h-9">
-                      <SelectValue placeholder="Pilih status pembayaran" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="LUNAS" className="text-xs">
-                      LUNAS
-                    </SelectItem>
-                    <SelectItem value="BELUM LUNAS" className="text-xs">
-                      BELUM LUNAS
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <FormField
+              control={control}
+              name="paymentStatus"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <span className="flex items-center text-xs sm:text-sm font-medium text-gray-700">
+                      <CreditCard className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                      Status Pembayaran
+                    </span>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="text-xs h-8 sm:h-9">
+                        <SelectValue placeholder="Pilih status pembayaran" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="LUNAS" className="text-xs">
+                        LUNAS
+                      </SelectItem>
+                      <SelectItem value="BELUM LUNAS" className="text-xs">
+                        BELUM LUNAS
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={control}
+              name="paymentDetailId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    <span className="flex items-center text-xs sm:text-sm font-medium text-gray-700">
+                      <Building2 className="mr-1 sm:mr-2 h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
+                      Detail Pembayaran
+                    </span>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger className="text-xs h-8 sm:h-9">
+                        <SelectValue placeholder="Pilih detail pembayaran" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {paymentDetails.map((detail) => (
+                        <SelectItem key={detail.id} value={detail.id} className="text-xs">
+                          {detail.bank_name} - {detail.account_number} ({detail.account_name})
+                          {detail.is_default && " - Default"}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <div className="bg-gradient-to-r from-green-50 to-green-100 p-3 sm:p-4 rounded-lg shadow-inner">

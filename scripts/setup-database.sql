@@ -1,3 +1,15 @@
+-- Create payment_details table
+CREATE TABLE IF NOT EXISTS payment_details (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    bank_name VARCHAR(100) NOT NULL,
+    account_number VARCHAR(50) NOT NULL,
+    account_name VARCHAR(255) NOT NULL,
+    is_default BOOLEAN DEFAULT false,
+    user_id VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create invoices table
 CREATE TABLE IF NOT EXISTS invoices (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -6,6 +18,7 @@ CREATE TABLE IF NOT EXISTS invoices (
     invoice_date DATE NOT NULL,
     payment_status VARCHAR(20) CHECK (payment_status IN ('LUNAS', 'BELUM LUNAS')) NOT NULL,
     total_amount DECIMAL(15,2) NOT NULL,
+    payment_detail_id UUID REFERENCES payment_details(id),
     user_id VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -23,10 +36,19 @@ CREATE TABLE IF NOT EXISTS invoice_items (
 );
 
 -- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_payment_details_user_id ON payment_details(user_id);
+CREATE INDEX IF NOT EXISTS idx_payment_details_is_default ON payment_details(is_default);
 CREATE INDEX IF NOT EXISTS idx_invoices_invoice_number ON invoices(invoice_number);
 CREATE INDEX IF NOT EXISTS idx_invoices_client_name ON invoices(client_name);
 CREATE INDEX IF NOT EXISTS idx_invoices_created_at ON invoices(created_at);
+CREATE INDEX IF NOT EXISTS idx_invoices_payment_detail_id ON invoices(payment_detail_id);
 CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON invoice_items(invoice_id);
+
+-- Insert default payment details
+INSERT INTO payment_details (bank_name, account_number, account_name, is_default, user_id) 
+VALUES 
+    ('BCA', '5050096370', 'Siti Rohmah', true, 'default')
+ON CONFLICT DO NOTHING;
 
 -- Insert sample data for testing
 INSERT INTO invoices (invoice_number, client_name, invoice_date, payment_status, total_amount, user_id) 

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "./auth-provider"
 import { Button } from "@/components/ui/button"
-import { Menu, X, FileText, History, LogOut, User } from "lucide-react"
+import { Menu, X, FileText, History, LogOut, User, Building2 } from "lucide-react"
 import Image from "next/image"
 
 export function Navbar() {
@@ -68,6 +68,17 @@ export function Navbar() {
               >
                 <History className="mr-2 h-4 w-4" />
                 Riwayat Invoice
+              </Link>
+              <Link
+                href="/payment-details"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  pathname === "/payment-details"
+                    ? "border-green-500 text-gray-900"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+              >
+                <Building2 className="mr-2 h-4 w-4" />
+                Detail Pembayaran
               </Link>
             </div>
           </div>
@@ -136,6 +147,20 @@ export function Navbar() {
               <span className="flex items-center">
                 <History className="mr-2 h-4 w-4" />
                 Riwayat Invoice
+              </span>
+            </Link>
+            <Link
+              href="/payment-details"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                pathname === "/payment-details"
+                  ? "bg-green-50 border-green-500 text-green-700"
+                  : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+              }`}
+              onClick={() => setIsOpen(false)}
+            >
+              <span className="flex items-center">
+                <Building2 className="mr-2 h-4 w-4" />
+                Detail Pembayaran
               </span>
             </Link>
             <div className="border-t border-gray-200 pt-3 pb-2">

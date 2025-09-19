@@ -1,8 +1,13 @@
 "use client"
 
 import { Document, Page, Text, View, StyleSheet, Font, Image } from "@react-pdf/renderer"
-import type { InvoiceData } from "@/lib/types"
+import type { InvoiceData, PaymentDetail } from "@/lib/types"
 import { formatDate, formatCurrency } from "@/lib/utils"
+
+interface InvoicePDFProps {
+  data: InvoiceData
+  paymentDetail?: PaymentDetail
+}
 
 // Register fonts
 Font.register({
@@ -175,9 +180,10 @@ const styles = StyleSheet.create({
 
 interface InvoicePDFProps {
   data: InvoiceData
+  paymentDetail?: PaymentDetail
 }
 
-export function InvoicePDF({ data }: InvoicePDFProps) {
+export function InvoicePDF({ data, paymentDetail }: InvoicePDFProps) {
   const calculateItemTotal = (price: number, quantity: number, discount: number) => {
     const total = price * quantity
     const discountAmount = (discount / 100) * total
@@ -273,16 +279,16 @@ export function InvoicePDF({ data }: InvoicePDFProps) {
           <View style={styles.paymentDetails}>
             <Text style={styles.sectionTitle}>Detail Pembayaran</Text>
             <View style={{ flexDirection: "row", marginBottom: 3 }}>
-              <Text style={{ width: 80 }}>Bank Name</Text>
-              <Text>: Bank Mandiri</Text>
+              <Text style={{ width: 80 }}>Bank</Text>
+              <Text>: {paymentDetail?.bank_name || "BCA"}</Text>
             </View>
             <View style={{ flexDirection: "row", marginBottom: 3 }}>
-              <Text style={{ width: 80 }}>Account Name</Text>
-              <Text>: Eka Venusia Anandari / Dyah Retnowati</Text>
+              <Text style={{ width: 80 }}>No. Rek</Text>
+              <Text>: {paymentDetail?.account_number || "5050096370"}</Text>
             </View>
             <View style={{ flexDirection: "row", marginBottom: 3 }}>
-              <Text style={{ width: 80 }}>Account No</Text>
-              <Text>: 1660022778898</Text>
+              <Text style={{ width: 80 }}>Atas Nama</Text>
+              <Text>: {paymentDetail?.account_name || "Siti Rohmah"}</Text>
             </View>
           </View>
 

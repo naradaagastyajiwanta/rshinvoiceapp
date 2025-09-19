@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useForm } from "react-hook-form"
 import { pdf } from "@react-pdf/renderer"
 import { InvoiceForm } from "@/components/invoice-form"
@@ -11,23 +11,42 @@ import { Card } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { FileDown, Printer, RefreshCw, Save } from "lucide-react"
-import type { InvoiceData } from "@/lib/types"
+import type { InvoiceData, PaymentDetail } from "@/lib/types"
 import { generateInvoiceNumber, saveInvoice } from "@/lib/invoice-utils"
 
 export function InvoiceGenerator() {
   const [activeTab, setActiveTab] = useState("form")
   const { toast } = useToast()
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([])
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: generateInvoiceNumber(),
     clientName: "",
     invoiceDate: new Date().toISOString().split("T")[0],
     items: [{ id: 1, description: "", quantity: 1, price: 0, discount: 0 }],
     paymentStatus: "LUNAS",
+    paymentDetailId: undefined,
   })
   const [isGenerating, setIsGenerating] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [isPrinting, setIsPrinting] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
+
+  useEffect(() => {
+    // Load payment details from localStorage
+    const savedDetails = localStorage.getItem('paymentDetails')
+    if (savedDetails) {
+      const details = JSON.parse(savedDetails)
+      setPaymentDetails(details)
+      
+      // Set default payment detail if not already set
+      if (!invoiceData.paymentDetailId) {
+        const defaultDetail = details.find((d: PaymentDetail) => d.is_default)
+        if (defaultDetail) {
+          setInvoiceData(prev => ({ ...prev, paymentDetailId: defaultDetail.id }))
+        }
+      }
+    }
+  }, [])
 
   const form = useForm<InvoiceData>({
     defaultValues: invoiceData,
@@ -117,8 +136,11 @@ export function InvoiceGenerator() {
         duration: 2000,
       })
 
+      // Get selected payment detail
+      const selectedPaymentDetail = paymentDetails.find(detail => detail.id === invoiceData.paymentDetailId)
+
       // Buat dokumen PDF
-      const blob = await pdf(<InvoicePDF data={invoiceData} />).toBlob()
+      const blob = await pdf(<InvoicePDF data={invoiceData} paymentDetail={selectedPaymentDetail} />).toBlob()
 
       // Buat URL untuk blob
       const url = URL.createObjectURL(blob)
