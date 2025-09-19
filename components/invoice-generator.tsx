@@ -205,7 +205,10 @@ export function InvoiceGenerator() {
 
           <TabsContent value="preview" className="mt-0 border-0 p-0 pb-20">
             <div className="mb-4 sm:mb-6 bg-white rounded-lg overflow-hidden shadow-lg">
-              <InvoicePreview data={invoiceData} />
+              <InvoicePreview 
+                data={invoiceData} 
+                paymentDetail={paymentDetails.find(detail => detail.id === invoiceData.paymentDetailId)} 
+              />
             </div>
           </TabsContent>
         </Tabs>

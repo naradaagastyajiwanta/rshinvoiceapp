@@ -1,12 +1,13 @@
-import type { InvoiceData } from "@/lib/types"
+import type { InvoiceData, PaymentDetail } from "@/lib/types"
 import { formatDate, formatCurrency } from "@/lib/utils"
 import Image from "next/image"
 
 interface InvoicePreviewProps {
   data: InvoiceData
+  paymentDetail?: PaymentDetail
 }
 
-export function InvoicePreview({ data }: InvoicePreviewProps) {
+export function InvoicePreview({ data, paymentDetail }: InvoicePreviewProps) {
   const calculateItemTotal = (price: number, quantity: number, discount: number) => {
     const total = price * quantity
     const discountAmount = (discount / 100) * total
@@ -116,16 +117,16 @@ export function InvoicePreview({ data }: InvoicePreviewProps) {
             <table className="text-[10px] sm:text-xs">
               <tbody>
                 <tr>
-                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">Bank Name</td>
-                  <td>: Bank Mandiri</td>
+                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">Bank</td>
+                  <td>: {paymentDetail?.bank_name || "BCA"}</td>
                 </tr>
                 <tr>
-                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">Account Name</td>
-                  <td>: Eka Venusia Anandari / Dyah Retnowati</td>
+                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">No. Rek</td>
+                  <td>: {paymentDetail?.account_number || "5050096370"}</td>
                 </tr>
                 <tr>
-                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">Account No</td>
-                  <td>: 1660022778898</td>
+                  <td className="pr-2 sm:pr-4 py-0.5 sm:py-1 text-gray-600">Atas Nama</td>
+                  <td>: {paymentDetail?.account_name || "Siti Rohmah"}</td>
                 </tr>
               </tbody>
             </table>
