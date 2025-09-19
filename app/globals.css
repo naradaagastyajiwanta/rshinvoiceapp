@@ -1,0 +1,266 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+
+    --secondary: 142.1 76.2% 96.3%;
+    --secondary-foreground: 142.1 76.2% 36.3%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 142.1 76.2% 94%;
+    --accent-foreground: 142.1 76.2% 36.3%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 142.1 76.2% 36.3%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 355.7 100% 97.3%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 142.1 76.2% 36.3%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  /* Meningkatkan ukuran tap target untuk perangkat mobile */
+  button,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    @apply touch-manipulation;
+  }
+
+  /* Memperbaiki ukuran font untuk perangkat mobile */
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Print styles - Diperbaiki untuk hasil yang lebih baik */
+@media print {
+  /* Sembunyikan semua elemen kecuali yang akan dicetak */
+  body * {
+    visibility: hidden !important;
+  }
+
+  /* Sembunyikan navbar dan tombol-tombol */
+  nav,
+  button,
+  .fixed.bottom-0,
+  .navbar,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  /* Tampilkan hanya invoice yang akan dicetak */
+  .invoice-preview,
+  .invoice-preview * {
+    visibility: visible !important;
+  }
+
+  /* Atur posisi dan ukuran invoice */
+  .invoice-preview {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* Pastikan semua warna dan background tercetak */
+  .invoice-preview {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Pastikan semua gambar tercetak */
+  .invoice-preview img {
+    display: block !important;
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Atur ukuran halaman dan margin */
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  /* Hilangkan shadow dan efek lain yang mungkin tidak tercetak dengan baik */
+  .invoice-preview .shadow-lg,
+  .invoice-preview .shadow-md,
+  .invoice-preview .shadow-sm {
+    box-shadow: none !important;
+  }
+
+  /* Pastikan teks tercetak dengan jelas */
+  .invoice-preview {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Pastikan semua elemen terlihat dengan jelas */
+  .invoice-preview .bg-gradient-to-r,
+  .invoice-preview .bg-green-600,
+  .invoice-preview .bg-green-700,
+  .invoice-preview .bg-gray-800,
+  .invoice-preview .bg-red-500,
+  .invoice-preview .bg-red-600 {
+    background-color: #15803d !important;
+    background-image: none !important;
+  }
+
+  .invoice-preview .text-white {
+    color: white !important;
+  }
+
+  .invoice-preview .border-green-100,
+  .invoice-preview .border-green-200,
+  .invoice-preview .border-gray-100,
+  .invoice-preview .border-gray-200 {
+    border-color: #d1d5db !important;
+  }
+}
+
+/* Custom animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #15803d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #106630;
+}
+
+/* Mobile-friendly styles */
+@media (max-width: 640px) {
+  .invoice-preview {
+    font-size: 0.875rem;
+  }
+
+  input[type="date"],
+  input[type="number"],
+  input[type="text"],
+  select {
+    font-size: 16px !important; /* Mencegah zoom otomatis di iOS */
+  }
+
+  /* Memperbaiki overflow pada tabel di mobile */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Mengurangi padding dan margin untuk layar kecil */
+  .p-3 {
+    padding: 0.5rem;
+  }
+
+  .m-3 {
+    margin: 0.5rem;
+  }
+
+  /* Memperkecil ukuran font untuk layar kecil */
+  .text-xs {
+    font-size: 0.7rem;
+  }
+
+  /* Memperbaiki tabel pada layar kecil */
+  table {
+    table-layout: fixed;
+  }
+
+  /* Menambahkan ruang untuk tombol pada layar kecil */
+  .gap-2 {
+    gap: 0.375rem;
+  }
+
+  /* Memastikan tombol-tombol aksi tetap terlihat */
+  .sticky {
+    position: sticky;
+    z-index: 10;
+  }
+}
