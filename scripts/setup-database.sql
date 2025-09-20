@@ -1,3 +1,16 @@
+-- Create products table
+CREATE TABLE IF NOT EXISTS products (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    price DECIMAL(15,2) NOT NULL CHECK (price >= 0),
+    category VARCHAR(100),
+    is_active BOOLEAN DEFAULT true,
+    user_id VARCHAR(100),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Create payment_details table
 CREATE TABLE IF NOT EXISTS payment_details (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -36,6 +49,9 @@ CREATE TABLE IF NOT EXISTS invoice_items (
 );
 
 -- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS idx_products_user_id ON products(user_id);
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category);
+CREATE INDEX IF NOT EXISTS idx_products_is_active ON products(is_active);
 CREATE INDEX IF NOT EXISTS idx_payment_details_user_id ON payment_details(user_id);
 CREATE INDEX IF NOT EXISTS idx_payment_details_is_default ON payment_details(is_default);
 CREATE INDEX IF NOT EXISTS idx_invoices_invoice_number ON invoices(invoice_number);
@@ -48,6 +64,18 @@ CREATE INDEX IF NOT EXISTS idx_invoice_items_invoice_id ON invoice_items(invoice
 INSERT INTO payment_details (bank_name, account_number, account_name, is_default, user_id) 
 VALUES 
     ('BCA', '5050096370', 'Siti Rohmah', true, 'default')
+ON CONFLICT DO NOTHING;
+
+-- Insert default products
+INSERT INTO products (name, description, price, category, user_id) 
+VALUES 
+    ('Sehat Dalam Sekejap', 'Program kesehatan cepat dan efektif', 300000, 'Konsultasi', 'default'),
+    ('Quantum Scan', 'Pemeriksaan kesehatan dengan teknologi quantum', 180000, 'Pemeriksaan', 'default'),
+    ('Program 7 Hari Menuju Sehat Raga & Jiwa', 'Program holistik 7 hari untuk kesehatan optimal', 6300000, 'Program', 'default'),
+    ('Konsultasi Kesehatan', 'Konsultasi langsung dengan ahli kesehatan', 250000, 'Konsultasi', 'default'),
+    ('Terapi Holistik', 'Terapi kesehatan secara menyeluruh', 350000, 'Terapi', 'default'),
+    ('Paket Detox', 'Program detoksifikasi tubuh alami', 500000, 'Program', 'default'),
+    ('Herbal Treatment', 'Pengobatan dengan ramuan herbal alami', 275000, 'Terapi', 'default')
 ON CONFLICT DO NOTHING;
 
 -- Insert sample data for testing

@@ -7,7 +7,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Card } from "@/components/ui/card"
 import { Trash2, Plus, FileText, Calendar, User, CreditCard, Tag, Percent, CheckCircle2, Building2 } from "lucide-react"
 import type { InvoiceData } from "@/lib/types"
-import { products } from "@/lib/products"
+import { getActiveProducts, getProductById } from "@/lib/products"
 import type { UseFormReturn } from "react-hook-form"
 import { useState, useEffect } from "react"
 
@@ -30,8 +30,12 @@ export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFor
   const { control, handleSubmit, watch, setValue } = form
   const items = watch("items")
   const [paymentDetails, setPaymentDetails] = useState<PaymentDetail[]>([])
+  const [products, setProducts] = useState<any[]>([])
 
   useEffect(() => {
+    // Load products
+    setProducts(getActiveProducts())
+    
     // Load payment details from localStorage
     const savedDetails = localStorage.getItem('paymentDetails')
     if (savedDetails) {
@@ -51,7 +55,7 @@ export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFor
 
   const addItem = () => {
     if (items.length < 3) {
-      setValue("items", [...items, { id: items.length + 1, description: "", quantity: 1, price: 0, discount: 0 }])
+      setValue("items", [...items, { id: items.length + 1, description: "", quantity: 1, price: 0, discount: 0, product_id: "" }])
     }
   }
 
@@ -65,13 +69,14 @@ export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFor
   }
 
   const handleProductSelect = (value: string, index: number) => {
-    const selectedProduct = products.find((p) => p.name === value)
+    const selectedProduct = getProductById(value)
     if (selectedProduct) {
       const updatedItems = [...items]
       updatedItems[index] = {
         ...updatedItems[index],
         description: selectedProduct.name,
         price: selectedProduct.price,
+        product_id: selectedProduct.id,
       }
       setValue("items", updatedItems)
     }
@@ -205,13 +210,13 @@ export function InvoiceForm({ form, onSubmit, isSubmitting = false }: InvoiceFor
                   <Label htmlFor={`product-${index}`} className="mb-1 block text-xs text-gray-700">
                     Produk/Layanan
                   </Label>
-                  <Select onValueChange={(value) => handleProductSelect(value, index)} value={item.description}>
+                  <Select onValueChange={(value) => handleProductSelect(value, index)} value={item.product_id || ""}>
                     <SelectTrigger id={`product-${index}`} className="text-xs h-8 sm:h-9">
                       <SelectValue placeholder="Pilih produk/layanan" />
                     </SelectTrigger>
                     <SelectContent>
                       {products.map((product) => (
-                        <SelectItem key={product.id} value={product.name} className="text-xs">
+                        <SelectItem key={product.id} value={product.id} className="text-xs">
                           {product.name} - Rp {product.price.toLocaleString("id-ID")}
                         </SelectItem>
                       ))}

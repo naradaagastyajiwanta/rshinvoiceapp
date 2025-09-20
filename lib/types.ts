@@ -1,7 +1,11 @@
 export interface Product {
-  id: number
+  id: string
   name: string
+  description?: string
   price: number
+  category?: string
+  is_active: boolean
+  user_id: string
 }
 
 export interface InvoiceItem {
@@ -10,6 +14,7 @@ export interface InvoiceItem {
   quantity: number
   price: number
   discount: number
+  product_id?: string
 }
 
 export interface PaymentDetail {
