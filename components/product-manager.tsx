@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
-import { Trash2, Edit, Plus, Package, Tag, DollarSign } from "lucide-react"
+import { Trash2, Edit, Plus, Package, Tag } from "lucide-react"
 import { toast } from "sonner"
 
 interface Product {
@@ -234,8 +234,7 @@ export default function ProductManager({ onProductChange }: ProductManagerProps)
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Kelola Produk & Layanan</h2>
+      <div className="flex items-center justify-end">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
@@ -369,8 +368,7 @@ export default function ProductManager({ onProductChange }: ProductManagerProps)
                         <p className="text-sm text-gray-600">{product.description}</p>
                       )}
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1">
-                          <DollarSign className="w-4 h-4 text-green-600" />
+                        <div className="flex items-center">
                           <span className="font-semibold text-lg text-green-600">
                             {formatCurrency(product.price)}
                           </span>

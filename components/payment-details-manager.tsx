@@ -169,8 +169,7 @@ export default function PaymentDetailsManager({ onPaymentDetailChange }: Payment
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold">Kelola Detail Pembayaran</h2>
+      <div className="flex items-center justify-end">
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button onClick={resetForm}>
