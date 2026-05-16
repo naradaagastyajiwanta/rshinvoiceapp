@@ -34,25 +34,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return
     }
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
-      if (firebaseUser) {
-        // Google sign-in users must be whitelisted; email/password users are always allowed
-        const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === "google.com")
-        if (isGoogleUser) {
-          const db = getFirebaseDb()
-          const email = firebaseUser.email
-          if (db && email) {
-            const snap = await getDoc(doc(db, "allowed_users", email))
-            if (!snap.exists()) {
-              await authHelpers.signOut()
-              setUser(null)
-              setIsLoading(false)
-              return
+      try {
+        if (firebaseUser) {
+          const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === "google.com")
+          if (isGoogleUser) {
+            const db = getFirebaseDb()
+            const email = firebaseUser.email
+            if (db && email) {
+              const snap = await getDoc(doc(db, "allowed_users", email))
+              if (!snap.exists()) {
+                await authHelpers.signOut()
+                setUser(null)
+                setIsLoading(false)
+                return
+              }
             }
           }
         }
+        setUser(firebaseUser)
+      } catch {
+        await authHelpers.signOut()
+        setUser(null)
+      } finally {
+        setIsLoading(false)
       }
-      setUser(firebaseUser)
-      setIsLoading(false)
     })
     return () => unsubscribe()
   }, [])
