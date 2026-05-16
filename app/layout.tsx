@@ -3,7 +3,6 @@ import "@/app/globals.css"
 import { Toaster } from "@/components/toaster"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AuthProvider } from "@/components/auth-provider"
-import { SupabaseStatus } from "@/components/supabase-status"
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -24,7 +23,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             {children}
             <Toaster />
-            <SupabaseStatus />
           </AuthProvider>
         </ThemeProvider>
       {/* v0 – built-with badge */}

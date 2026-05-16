@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { authHelpers } from "@/lib/supabase"
+import { authHelpers } from "@/lib/firebase"
 import { Eye, EyeOff, Lock, Save, ArrowLeft } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
@@ -20,18 +20,16 @@ export default function ResetPasswordPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [isValidToken, setIsValidToken] = useState(false)
+  const [oobCode, setOobCode] = useState<string | null>(null)
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
 
   useEffect(() => {
-    // Check if we have the required tokens in URL
-    const accessToken = searchParams.get("access_token")
-    const refreshToken = searchParams.get("refresh_token")
-
-    if (accessToken && refreshToken) {
-      setIsValidToken(true)
+    // Firebase reset password link contains oobCode query param
+    const code = searchParams.get("oobCode")
+    if (code) {
+      setOobCode(code)
     } else {
       toast({
         title: "Link tidak valid",
@@ -53,7 +51,6 @@ export default function ResetPasswordPage() {
       return
     }
 
-    // Validate password length
     if (password.length < 6) {
       toast({
         title: "Error",
@@ -63,7 +60,6 @@ export default function ResetPasswordPage() {
       return
     }
 
-    // Validate password match
     if (password !== confirmPassword) {
       toast({
         title: "Error",
@@ -73,27 +69,26 @@ export default function ResetPasswordPage() {
       return
     }
 
+    if (!oobCode) {
+      toast({
+        title: "Error",
+        description: "Link reset password tidak valid",
+        duration: 3000,
+      })
+      return
+    }
+
     setIsLoading(true)
 
     try {
-      const { data, error } = await authHelpers.updatePassword(password)
+      const { error } = await authHelpers.confirmPasswordReset(oobCode, password)
 
       if (error) {
-        console.error("Update password error:", error)
-
-        if (error.message.includes("not available")) {
-          toast({
-            title: "Mode Offline",
-            description: "Update password tidak tersedia dalam mode offline",
-            duration: 5000,
-          })
-        } else {
-          toast({
-            title: "Error",
-            description: error.message || "Terjadi kesalahan saat mengupdate password",
-            duration: 3000,
-          })
-        }
+        toast({
+          title: "Error",
+          description: error.message || "Terjadi kesalahan saat mengupdate password",
+          duration: 3000,
+        })
         return
       }
 
@@ -103,7 +98,6 @@ export default function ResetPasswordPage() {
         duration: 5000,
       })
 
-      // Redirect to login page
       router.push("/login")
     } catch (error: any) {
       console.error("Reset password error:", error)
@@ -117,7 +111,7 @@ export default function ResetPasswordPage() {
     }
   }
 
-  if (!isValidToken) {
+  if (!oobCode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-green-50 to-white p-3 sm:p-4">
         <Card className="w-full max-w-sm sm:max-w-md shadow-xl border-0">

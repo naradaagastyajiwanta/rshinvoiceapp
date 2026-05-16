@@ -6,7 +6,7 @@ import type React from "react"
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useToast } from "@/hooks/use-toast"
-import { authHelpers } from "@/lib/supabase"
+import { authHelpers } from "@/lib/firebase"
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({

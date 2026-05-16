@@ -24,12 +24,11 @@ export function Navbar() {
     return null
   }
 
-  // Get display name from user
   const getDisplayName = () => {
-    if (user?.user_metadata?.name) {
-      return user.user_metadata.name
+    if (user?.displayName) {
+      return user.displayName
     } else if (user?.email) {
-      return user.email.split("@")[0] // Use part before @ as name
+      return user.email.split("@")[0]
     } else {
       return "User"
     }

@@ -18,7 +18,7 @@ export default function HistoryPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [isNetworkError, setIsNetworkError] = useState(false)
-  const [dataSource, setDataSource] = useState<"supabase" | "local" | "hybrid" | "none">("none")
+  const [dataSource, setDataSource] = useState<"firebase" | "local" | "hybrid" | "none">("none")
   const { toast } = useToast()
 
   useEffect(() => {
@@ -57,12 +57,6 @@ export default function HistoryPage() {
             title: "Mode Offline",
             description: "Menampilkan data dari penyimpanan lokal karena tidak dapat terhubung ke server",
             duration: 5000,
-          })
-        } else if (source === "hybrid") {
-          toast({
-            title: "Mode Hybrid",
-            description: "Menampilkan data dari server dan penyimpanan lokal",
-            duration: 3000,
           })
         }
       }

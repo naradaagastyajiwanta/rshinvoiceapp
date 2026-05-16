@@ -23,7 +23,7 @@ export default function InvoiceDetailPage() {
   const [isDownloading, setIsDownloading] = useState(false)
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [dataSource, setDataSource] = useState<"supabase" | "local" | "none">("none")
+  const [dataSource, setDataSource] = useState<"firebase" | "local" | "none">("none")
 
   const fetchInvoiceDetails = async () => {
     if (!params.id) {

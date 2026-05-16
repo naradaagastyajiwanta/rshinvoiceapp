@@ -2,13 +2,12 @@
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { getSupabaseClient } from "@/lib/supabase"
-import type { User, Session } from "@supabase/supabase-js"
+import { getFirebaseAuth, getFirebaseDb, authHelpers, getDoc, doc } from "@/lib/firebase"
+import { onAuthStateChanged, type User } from "firebase/auth"
 
 interface AuthContextType {
   isLoggedIn: boolean
   user: User | null
-  session: Session | null
   isLoading: boolean
   logout: () => Promise<void>
 }
@@ -16,7 +15,6 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   isLoggedIn: false,
   user: null,
-  session: null,
   isLoading: true,
   logout: async () => {},
 })
@@ -25,55 +23,40 @@ export const useAuth = () => useContext(AuthContext)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
-  const [session, setSession] = useState<Session | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
   const pathname = usePathname()
-  const supabase = getSupabaseClient()
 
   useEffect(() => {
-    // Get initial session
-    const getInitialSession = async () => {
-      try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession()
-
-        if (error) {
-          console.error("Error getting session:", error)
-          setUser(null)
-          setSession(null)
-        } else {
-          setSession(session)
-          setUser(session?.user ?? null)
-        }
-      } catch (error) {
-        console.error("Error in getInitialSession:", error)
-        setUser(null)
-        setSession(null)
-      } finally {
-        setIsLoading(false)
-      }
+    const firebaseAuth = getFirebaseAuth()
+    if (!firebaseAuth) {
+      setIsLoading(false)
+      return
     }
-
-    getInitialSession()
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state changed:", event, session?.user?.email)
-
-      setSession(session)
-      setUser(session?.user ?? null)
+    const unsubscribe = onAuthStateChanged(firebaseAuth, async (firebaseUser) => {
+      if (firebaseUser) {
+        // Google sign-in users must be whitelisted; email/password users are always allowed
+        const isGoogleUser = firebaseUser.providerData.some((p) => p.providerId === "google.com")
+        if (isGoogleUser) {
+          const db = getFirebaseDb()
+          const email = firebaseUser.email
+          if (db && email) {
+            const snap = await getDoc(doc(db, "allowed_users", email))
+            if (!snap.exists()) {
+              await authHelpers.signOut()
+              setUser(null)
+              setIsLoading(false)
+              return
+            }
+          }
+        }
+      }
+      setUser(firebaseUser)
       setIsLoading(false)
     })
+    return () => unsubscribe()
+  }, [])
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth])
-
-  // Redirect logic
   useEffect(() => {
     if (!isLoading) {
       const isLoggedIn = !!user
@@ -93,27 +76,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        console.error("Error signing out:", error)
-      }
+      await authHelpers.signOut()
     } catch (error) {
       console.error("Error in logout:", error)
     } finally {
-      // Clear state
       setUser(null)
-      setSession(null)
       router.push("/login")
     }
   }
 
-  const value = {
-    isLoggedIn: !!user,
-    user,
-    session,
-    isLoading,
-    logout,
-  }
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+  return (
+    <AuthContext.Provider value={{ isLoggedIn: !!user, user, isLoading, logout }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
